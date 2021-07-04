@@ -6,8 +6,8 @@ st.set_page_config(layout="wide")
 import pandas as pd
 import matplotlib.pyplot as plt
 # import tensorflow as tf
-import tensorflow_hub
-import tensorflow_text
+# import tensorflow_hub
+# import tensorflow_text
 import numpy as np
 
 @st.cache
