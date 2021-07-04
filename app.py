@@ -81,7 +81,7 @@ def pred_sent(text):
 
 use = load_use("https://tfhub.dev/google/universal-sentence-encoder-multilingual-large/3")
 model = tf.keras.models.load_model('./Model/saved_model/sentiment_analysis_model')
-data = pd.read_csv('./Data/movie_trailer_comments_sentiment.csv')
+data = pd.read_csv('./movie_trailer_comments_sentiment.csv')
 all_df = data.drop(['Unnamed: 0', 'index'], axis=1)
 df = all_df
 col1, col2 = st.beta_columns([2,1])
