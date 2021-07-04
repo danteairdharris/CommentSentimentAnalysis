@@ -5,7 +5,7 @@ st.set_page_config(layout="wide")
 # for data management
 import pandas as pd
 import matplotlib.pyplot as plt
-import tensorflow as tf
+# import tensorflow as tf
 import tensorflow_hub
 import tensorflow_text
 import numpy as np
@@ -79,8 +79,8 @@ def pred_sent(text):
 
     
 
-use = load_use("https://tfhub.dev/google/universal-sentence-encoder-multilingual-large/3")
-model = tf.keras.models.load_model('./Model/saved_model/sentiment_analysis_model')
+# use = load_use("https://tfhub.dev/google/universal-sentence-encoder-multilingual-large/3")
+# model = tf.keras.models.load_model('./Model/saved_model/sentiment_analysis_model')
 data = pd.read_csv('./movie_trailer_comments_sentiment.csv')
 all_df = data.drop(['Unnamed: 0', 'index'], axis=1)
 df = all_df
@@ -145,14 +145,14 @@ with col2:
     col2_container.write('Test the model by inputing some text below and having it classified.')
     
     text = col2_container.text_input('Input')
-    if text:
-        text_arr = []
-        emb = use(text)
-        text_emb = tf.reshape(emb, [-1]).numpy()
-        text_arr.append(text_emb)
+#     if text:
+#         text_arr = []
+#         emb = use(text)
+#         text_emb = tf.reshape(emb, [-1]).numpy()
+#         text_arr.append(text_emb)
 
-        text_arr = np.array(text_arr)
-        col2_container.text(pred_sent(text_arr))
+#         text_arr = np.array(text_arr)
+#         col2_container.text(pred_sent(text_arr))
 
 
 
