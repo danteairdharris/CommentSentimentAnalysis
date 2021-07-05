@@ -6,6 +6,7 @@ st.set_page_config(layout="wide")
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from wordcloud import WordCloud
 
 # for model testing in app w/ tensorflow
 # import tensorflow as tf
@@ -90,6 +91,46 @@ def pred_sent(text):
     pred = model.predict(text)
     return get_sent(pred)
 
+@st.cache
+def sk_test(text):
+    text_arr = [text]
+    vectorizer = TfidfVectorizer()
+    vectorizer.fit_transform(fit_vec)
+    test_vec = vectorizer.transform(text_arr)
+    pred = model.predict(test_vec)
+    return str(pred[0])
+
+@st.cache
+def vectorize_df(df):
+    all_comments = df['Comment'].str.cat()
+    corpus = [all_comments]
+    vectorizer = TfidfVectorizer(stop_words='english', ngram_range = (1,1), max_df = 1, min_df = .0001)
+    X = vectorizer.fit_transform(corpus)
+    feature_names = vectorizer.get_feature_names()
+    dense = X.todense()
+    denselist = dense.tolist()
+    # tf-idf matrix
+    tfidf_df = pd.DataFrame(denselist, columns=feature_names)
+    
+    data = tfidf_df.transpose()
+    data.columns = ['comments']
+    return data
+
+
+
+def white_color_func(word, font_size, position,orientation,random_state=None, **kwargs):
+        return("hsl(0,0%,100%)")
+    
+@st.cache
+def wordcloud(vec_df):
+    # set the wordcloud background color to white
+    # set max_words to 100
+    # set width and height to higher quality, 2000 x 1000
+    wordcloud = WordCloud(background_color="black", width=2000, height=1000, max_words=100).generate_from_frequencies(vec_df['comments'])
+    # set the word color to black
+    wordcloud.recolor(color_func = white_color_func)
+    return wordcloud
+
     
 ## tf model 
 # use = load_use("https://tfhub.dev/google/universal-sentence-encoder-multilingual-large/3")
@@ -160,6 +201,8 @@ with col2:
     * Comment: 'Somehow, I think the continuation of the previous story could have been a better idea.'  
     * TensorFlow model : positive,  SKLearn model : negative
 """)
+#     col2_container.markdown("![Alt Text](https://github.com/danteairdharris/CommentSentimentAnalysis/blob/master/app_demo.gif)")
+    col2_container.image('./app_demo.gif')
     col2_container.text('\n')
     col2_container.write('Test the model by inputing some text below and having it classified.')
     
@@ -167,14 +210,7 @@ with col2:
     
 #     sklearn model test
     if text:
-        text_arr = [text]
-        vectorizer = TfidfVectorizer()
-        vectorizer.fit_transform(fit_vec)
-        test_vec = vectorizer.transform(text_arr)
-        pred = model.predict(test_vec)
-        col2_container.text('SKLearn classification: ' + str(pred[0]))
-
-
+        col2_container.text('SKLearn classification: ' + sk_test(text))
 
     
 #     tensorflow model test
@@ -188,8 +224,9 @@ with col2:
 #         col2_container.text(pred_sent(text_arr))
 
 
-data_overview = col1_container_top.beta_expander('Data Overview')
+data_overview = col1_container_top.beta_expander('Dynamic Data Overview')
 with data_overview:
+    
     ## plot data
     dfcount = figure(df)
     dfcount = dfcount.reset_index()
@@ -197,7 +234,22 @@ with data_overview:
     width = 0.35
     ax.barh(dfcount['Title'], dfcount['Positive'], width, label='postive')
     ax.barh(dfcount['Title'], dfcount['Negative'], width, align='edge', label='negative')
+    
+    # Overall Sentiment   
+    pos = dfcount['Positive'].sum()
+    neg = dfcount['Negative'].sum()
+    ratio = pos / neg
+    if pos > neg:
+        overall = 'Positive'
+    elif pos < neg:
+        overall = 'Negative'
+    else:
+        overall = 'Neutral'
 
+    data_overview.write('Overall comment sentiment for selected dataframe: ')
+    data_overview.text(overall + ' with a %.2f to 1 ratio' % ratio)
+    
+  
     ## styling plot
     plt.xticks(rotation=90)
     ax.set_facecolor('#000000')
@@ -210,7 +262,23 @@ with data_overview:
     ax.tick_params(axis='y', colors='white')
     plt.setp(plt.title('Positive(blue) and Negative(orange) Reviews by Movie Title', color='w'))
     data_overview.pyplot(fig)
-
+    
+    
+    data_overview.write('Wordcloud for selected Dataframe: ')
+    ## mount wordcloud
+    # concatenate all comments into a corpus for vectorization
+    vec_df = vectorize_df(df)
+    wordcloud = wordcloud(vec_df)
+    # set the figsize
+    plt.figure(figsize=[15,10])
+    ## plot wordcloud
+    fig, ax = plt.subplots()
+    plt.axis('off')
+    plt.tight_layout()
+    plt.imshow(wordcloud)
+    plt.savefig('cloud.png', bbox_inches='tight',pad_inches = 0)
+    data_overview.image('cloud.png', width=875)
+    
 ## render dataframe
 col1_container_top.dataframe(df)
 
