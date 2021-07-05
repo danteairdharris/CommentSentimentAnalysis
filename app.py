@@ -5,28 +5,41 @@ st.set_page_config(layout="wide")
 # for data management
 import pandas as pd
 import matplotlib.pyplot as plt
-import tensorflow as tf
-import tensorflow_hub
-import tensorflow_text
 import numpy as np
 
-@st.cache
-def load_use(url):
-    return tensorflow_hub.load(url)
-     
+# for model testing in app w/ tensorflow
+# import tensorflow as tf
+# import tensorflow_hub
+# import tensorflow_text
+
+# @st.cache
+# def load_use(url):
+#     return tensorflow_hub.load(url)
+
+
+# for model testing in app w/ sklearn
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+import pickle
+
+
+def load_data(filename):
+    with open(filename, 'rb') as f:
+        return pickle.load(f)
+
+
 def get_sent(pred):
     if np.argmax(pred) == 0:
         return 'negative'
     else: 
         return 'positive'
     
-def transform_predict(text):
-    text_arr = []
-    emb = use(text)
-    text_emb = tf.reshape(emb, [-1]).numpy()
-    text_arr.append(text_emb) 
-    text_arr = np.array(text_arr)
-    return get_sent(model.predict(text_arr))
+# def transform_predict(text):
+#     text_arr = []
+#     emb = use(text)
+#     text_emb = tf.reshape(emb, [-1]).numpy()
+#     text_arr.append(text_emb) 
+#     text_arr = np.array(text_arr)
+#     return get_sent(model.predict(text_arr))
 
 def sort_by_title(df, select, options):  
     if select == 'All':
@@ -78,9 +91,14 @@ def pred_sent(text):
     return get_sent(pred)
 
     
-
+## tf model 
 # use = load_use("https://tfhub.dev/google/universal-sentence-encoder-multilingual-large/3")
 # model = tf.keras.models.load_model('./Model/saved_model/sentiment_analysis_model')
+
+## sklearn model
+model = load_data('./Model/logreg_model.pickle')
+fit_vec = load_data('./Model/fit_vector.pickle')
+
 data = pd.read_csv('./movie_trailer_comments_sentiment.csv')
 all_df = data.drop(['Unnamed: 0', 'index'], axis=1)
 df = all_df
@@ -133,39 +151,45 @@ with col2:
     col2_container.text('\n\n')
     col2_container.write("""
     ### About Model
-    #### The basic Tensorflow model I built uses data from IMDB dataset with 50k samples to classify movie review sentiment as positive or negative. It was evaluated at 84% accuracy. Here the model is being used to classify comment sentiment from youtube trailers of upcoming movies.
+    #### The basic Tensorflow model I built uses data from IMDB dataset with 50k samples to classify movie review sentiment as positive or negative. It was evaluated at 84% accuracy. Here the model is being used to classify comment sentiment from youtube trailers of upcoming movies. Compare the model's performance against a model built from sklearn ML library evaluated at 90% accuracy.
 """)
     col2_container.text('\n\n')
     col2_container.write("""
     ### Example:
-    * 1) 'The last movie was really good. I Can't wait for the sequel, so excited.'  (positive) 
-    * 2) 'This movie doesnt look that interesting. I'll pass.'  (negative) 
+    * index: 41,  Title: DONT BREATH 2
+    * Comment: 'Somehow, I think the continuation of the previous story could have been a better idea.'  
+    * TensorFlow model : positive,  SKLearn model : negative
 """)
     col2_container.text('\n')
     col2_container.write('Test the model by inputing some text below and having it classified.')
     
     text = col2_container.text_input('Input')
+    
+#     sklearn model test
     if text:
-        text_arr = []
-        emb = use(text)
-        text_emb = tf.reshape(emb, [-1]).numpy()
-        text_arr.append(text_emb)
-
-        text_arr = np.array(text_arr)
-        col2_container.text(pred_sent(text_arr))
-
+        text_arr = [text]
+        vectorizer = TfidfVectorizer()
+        vectorizer.fit_transform(fit_vec)
+        test_vec = vectorizer.transform(text_arr)
+        pred = model.predict(test_vec)
+        col2_container.text('SKLearn classification: ' + str(pred[0]))
 
 
 
-## render dataframe
-col1_container_top.dataframe(df)
+    
+#     tensorflow model test
+#     if text:
+#         text_arr = []
+#         emb = use(text)
+#         text_emb = tf.reshape(emb, [-1]).numpy()
+#         text_arr.append(text_emb)
 
-## body spacing
-col1_container_mid.text('\n')
-col1_container_mid.text('\n')
+#         text_arr = np.array(text_arr)
+#         col2_container.text(pred_sent(text_arr))
 
-## if all movies are currently selected
-if len(df) == 988:
+
+data_overview = col1_container_top.beta_expander('Data Overview')
+with data_overview:
     ## plot data
     dfcount = figure(df)
     dfcount = dfcount.reset_index()
@@ -185,25 +209,36 @@ if len(df) == 988:
     ax.yaxis.label.set_color('white')
     ax.tick_params(axis='y', colors='white')
     plt.setp(plt.title('Positive(blue) and Negative(orange) Reviews by Movie Title', color='w'))
-    col1_container_bot.pyplot(fig)
+    data_overview.pyplot(fig)
 
-else :
-    df_table = df
-    ## else render comment/comments
-    col1_container_bot.text('Filtering... ')
-    no_comments = len(df_table)
-    if len(df_table) == 988:
-        movie_title = select1
-    else:
-        movie_title = df_table.Title.unique().tolist()
-    sentiment = select2
-    col1_container_bot.text('# of Comments: ' + str(no_comments))
-    col1_container_bot.text(movie_title)
-    col1_container_bot.text('Sentiment: ' + sentiment)
-    col1_container_bot.write(""" 
-        ## Comments
-    """)
-    col1_container_bot.table(df_table.drop(['Title', 'Comment Length', 'Language'], axis=1))
+## render dataframe
+col1_container_top.dataframe(df)
+
+## body spacing
+col1_container_mid.text('\n')
+col1_container_mid.text('\n')
+
+## if all movies are currently selected
+# if len(df) == 988:
+   
+
+# else :
+df_table = df
+## else render comment/comments
+col1_container_bot.text('Filtering... ')
+no_comments = len(df_table)
+if len(df_table) == 988:
+    movie_title = select1
+else:
+    movie_title = df_table.Title.unique().tolist()
+sentiment = select2
+col1_container_bot.text('# of Comments: ' + str(no_comments))
+col1_container_bot.text(movie_title)
+col1_container_bot.text('Sentiment: ' + sentiment)
+col1_container_bot.write(""" 
+    ## Comments
+""")
+col1_container_bot.table(df_table.drop(['Title', 'Comment Length', 'Language'], axis=1))
 
 
     
