@@ -1,6 +1,6 @@
 # [Youtube Comments Text Sentiment Analysis Model and Data Exploration](https://yt-comment-sentiment-analysis.herokuapp.com/)
 ## Project Overview
-This data tool is a use case demonstration of a text sentiment analysis classifier. The web app displays comments from a list of upcoming movie trailer youtube videos and performs a sentiment analysis on them with model evaluation of 90% accuracy. 
+This data tool is a use case demonstration of a text sentiment analysis classifier. The web app displays comments from a list of upcoming movie trailer videos off youtube and performs a sentiment analysis on them with a tensorflow built model with an evaluation of 84% accuracy. The app simultaneously allows for the use of another model, an SKLearn built model with an evaluation of 90% accuracy, to re-classify the pre-evaluated sentiments and compare performance.
 
 ### How to use the Web App:
 * Paste in a comment from the data frame to compare the tensorflow model's performance against the sklearn model. Or simply paste in a test comment as if you were commenting under a trailer video. The SK model will predict its sentiment and display it.
