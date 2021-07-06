@@ -23,15 +23,10 @@ Here are some tasks that were tackled in the cleaning process:
 
 ## Exploratory Data Analysis
 ![alt text](https://github.com/danteairdharris/CommentSentimentAnalysis/blob/master/cloud_still.png)
-![alt text](https://github.com/danteairdharris/BoxOfficeDS/blob/master/releasemonth.png)
-![alt text](https://github.com/danteairdharris/BoxOfficeDS/blob/master/heatmap.png)
+![alt text](https://github.com/danteairdharris/CommentSentimentAnalysis/blob/master/bar.png)
 
 ## Model
-The model utilizes python library SciKit Learn to build a Random Forest Regression and Linear Regression trained on the aforementioned dataset.
-* The features passed to the model include Release Month, Budget, Box Office Opening, and Rating. 
-* The dataset is split into train and test sets with 20% of the data reserved for testing and 80% for training. 
-* A grid search was used to find the optimal parameter set for the Random Forest Regression.
-* The model determined the RF regression performed better with a MAE of ~ $45 Million
+The tensorflow model utilizes a Sequential architecture with 2 each Dense and Dropout hidden layers. SKLearn OneHotEncoder and Google Universal Sentence Encoder are used to encode and embed text respectively. The final model is evaluated at 0.84 accuracy with 0.36 validation loss. The SKLearn model performs better at an evaluated 0.90 accuracy mostly due to its use of Term Frequency x Inverse Document Frequency vectorization which helps to reduce the prevalence of frequent unimportant terms like 'the' and 'movie' in our bag of words representation. The comment sentiments were pre evaluated using the Tensorflow model but the web app gives the user the opportunity to re-classify them (or any text) using the SKLearn model to compare performance.
 
 ## Productionization
 Used Streamlit to quickly and cleanly deploy the model for use.
