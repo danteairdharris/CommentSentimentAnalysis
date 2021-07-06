@@ -1,31 +1,25 @@
-# [Youtube Comments Text Sentiment Analysis Model and Data Exploration](https://box-office-predictive-model.herokuapp.com/)
+# [Youtube Comments Text Sentiment Analysis Model and Data Exploration](https://yt-comment-sentiment-analysis.herokuapp.com/)
 ## Project Overview
-This data tool is a use case demonstration of a text sentiment analysis classifier.
+This data tool is a use case demonstration of a text sentiment analysis classifier. The web app displays comments from a list of upcoming movie trailer youtube videos and performs a sentiment analysis on them with model evaluation of 90% accuracy. 
 
 ### How to use the Web App:
-* Paste in a wikipedia url of the film in question. (Example: https://en.wikipedia.org/wiki/Avengers:_Endgame) The model will predict its Gross Box Office and display it, the current Box Office, and a performance evaluation based on those two figures.
-![alt text](https://github.com/danteairdharris/BoxOfficeDS/blob/master/howto.png)
+* Paste in a comment from the data frame to compare the tensorflow model's performance against the sklearn model. Or simply paste in a test comment as if you were commenting under a trailer video. The SK model will predict its sentiment and display it.
 
 ## Data Collection
-I used Beautiful Soup python library to built a script to scrape the relevant data from Wikipedia and Box Office Mojo. With each movie, the following data was scraped(if applicable):
+I used Selenium to scrape a list of youtube videos' relevant data. With each video, the following data was scraped:
 * Title
-* Producer/Director
-* Cast
-* Language
-* Country 
-* Release Date
-* Running Time
-* Budget
-* Box Office
-* Opening Box Office
-* MPAA Rating 
+* Views
+* Video Likes
+* Video Dislikes
+* Top 50 Comments
+
+I also utilized the IMDB reviews dataset for the creation of my classification model. It consists of 25k positive reviews and 25k negative reviews.
 
 ## Data Cleaning
 Here are some tasks that were tackled in the cleaning process:
-* Converted Release Date to python date-time object 
-* Parsed Budget anf Box Office data to ensure a numeric representation of the money.
-* Parsed Strings to strip whitespace and unwanted characters and compound features with multiple values into lists.
-* Simple Feature Engineering to Extract release month from Release Date date-time object
+* Parsed title to clean text.
+* Feature engineered comment length and language.
+* (IMDB dataset)Parsed review to remove random html tags.
 
 ## Exploratory Data Analysis
 ![alt text](https://github.com/danteairdharris/BoxOfficeDS/blob/master/totalbudget.png)
