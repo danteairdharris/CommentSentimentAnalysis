@@ -22,7 +22,7 @@ Here are some tasks that were tackled in the cleaning process:
 * (IMDB dataset)Parsed review to remove random html tags.
 
 ## Exploratory Data Analysis
-![alt text](https://github.com/danteairdharris/BoxOfficeDS/blob/master/totalbudget.png)
+![alt text](https://github.com/danteairdharris/CommentSentimentAnalysis/blob/master/cloud_still.png)
 ![alt text](https://github.com/danteairdharris/BoxOfficeDS/blob/master/releasemonth.png)
 ![alt text](https://github.com/danteairdharris/BoxOfficeDS/blob/master/heatmap.png)
 
